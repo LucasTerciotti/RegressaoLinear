@@ -289,7 +289,7 @@ mse2</code></pre>
 <pre class="r"><code>mse3 &lt;- mse(h3,pr)
 mse3</code></pre>
 <pre><code>## [1] 446.5096</code></pre>
-<p>As previsões feitas por h2 permitiram reduzir bem o valor do MSE da regressão, tornando-a mais eficiente que h1. Percebe-se também que a retirada da garagem, na estruturação da regressão, alterou pouco o MSE, de modo que ele contribui pouco para a análise.</p>
+<p>As previsões feitas por h2 permitiram reduzir bem o valor do MSE da regressão, tornando-a mais eficiente que h1. Percebe-se também que a retirada da garagem, na estruturação da regressão 3 (h3), alterou pouco o MSE3, confirmando a análise da anova que ele mostrou sua baixa contribuição para a análise (os outros dois fatores são mais relevantes).</p>
 <pre class="r"><code>T2 &lt;- hr
 T2$R2 &lt;- h2
 select(T2, preco, R2)</code></pre>
