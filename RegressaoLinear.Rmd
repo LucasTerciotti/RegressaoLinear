@@ -1,0 +1,131 @@
+---
+title: "Regressao"
+author: "Lucas Terciotti"
+output: html_document
+---
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(hydroGOF)
+```
+
+###Preparação:
+```{r}
+hr <- read.csv(("https://raw.githubusercontent.com/Efsilvaa/EPSMLRepo/master/Data/housingSmall2.csv"),
+                    stringsAsFactors=FALSE,
+                    na.strings = c(""))
+str(hr)
+colnames(hr)
+colnames(hr)[2]="area"
+colnames(hr)[3]="garagem"
+colnames(hr)[4]="quartos"
+colnames(hr)[5]="preco"
+pr <- hr$preco
+
+g <-  ggplot(data = hr, aes(x=area,y=preco))
+g <-  g+geom_point()+ 
+  labs(title="Preços de Venda de imóveis",y="Preço(xR$1000,00)",x="Área(x100m2)")
+g
+```
+
+###Regressao
+
+```{r}
+hr_lm <- lm(data=hr,preco~area)
+hr_lm
+```
+
+Usando a regressão para prever valores:
+```{r}
+predict(hr_lm)
+
+previsao <- hr
+previsao$R1 <- predict(hr_lm)
+select(previsao, preco, R1)
+```
+
+Tentando prever com base em um valor específico (casa de 200m²):
+```{r}
+y = hr_lm$coef[1] + 2.0*(hr_lm$coef[2])
+y
+```
+
+Essa regressão não descreve bem os dados.
+```{r}
+summary(hr_lm)
+```
+
+```{r}
+g <- g + 
+  stat_smooth(method = lm, se = FALSE,
+              formula = y ~ x,
+              colour = "Black", linetype = "solid")
+g
+```
+
+Buscando a intersecção para destacar a previsão de uma casa de 200m²:
+```{r}
+
+p <- g + geom_vline(xintercept = 2.0, size = 1, colour = "green", linetype = "longdash")
+p <- p + geom_hline(yintercept = 211.1184, size = 1, colour = "green", linetype = "longdash") 
+
+p
+```
+
+###Regressao linear polinomial:
+Regressão quadrática
+```{r}
+k <- g + stat_smooth(method =lm,se = FALSE,formula=y~poly(x,2, raw = TRUE),colour="Red")
+k
+```
+
+Regressão cúbica
+```{r}
+k + stat_smooth(method =lm,se = FALSE,formula=y~x+I(x^2)+I(x^3),colour="Green") 
+```
+
+Regressão polinomial de ordem 17 (Overfitting)
+```{r}
+j <- k + stat_smooth(method =lm,se = FALSE,formula=y~poly(x,17, raw = TRUE),colour="Blue") 
+j
+```
+
+##Utilizando mais de uma variável na regressão:
+
+```{r}
+hr_lm <- lm(data=hr,preco~area)
+hr_lm2 <- lm(data=hr, preco~area+garagem+quartos)
+hr_lm3 <- lm(data=hr, preco~area+quartos)
+h1 <- fitted(hr_lm)
+h2 <- fitted(hr_lm2)
+h3 <- fitted(hr_lm3)
+anova(hr_lm)
+anova(hr_lm2)
+anova(hr_lm3)
+mse1 <- mse(h1,pr)
+mse1
+mse2 <- mse(h2,pr)
+mse2
+mse3 <- mse(h3,pr)
+mse3
+```
+
+As previsões feitas por h2 permitiram reduzir bem o valor do MSE da regressão, tornando-a mais eficiente que h1. Percebe-se também que a retirada da garagem, na estruturação da regressão, alterou pouco o MSE, de modo que ele contribui pouco para a análise.
+
+```{r}
+T2 <- hr
+T2$R2 <- h2
+select(T2, preco, R2)
+```
+
+
+###Prevendo um valor com base em h2:
+```{r}
+a=1 #area*100
+g=0 #numero de garagens
+q=2 #numero de quartos
+
+y = 32.333993+(a*35.244193)+(g*3.701131)+(q*37.128)
+y
+```
+Esse seria o valor de uma casa de 100m², nenhuma garagem e 2 quartos, segundo a previsão.
