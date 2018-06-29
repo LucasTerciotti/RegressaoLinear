@@ -29,7 +29,7 @@ g
 ```
 
 ###Regressao
-
+Regressão considerando apenas os valores de área:
 ```{r}
 hr_lm <- lm(data=hr,preco~area)
 hr_lm
@@ -50,7 +50,7 @@ y = hr_lm$coef[1] + 2.0*(hr_lm$coef[2])
 y
 ```
 
-Essa regressão não descreve bem os dados.
+Essa regressão não descreve bem os dados. Existem outras variáveis que podem ajudar a descrever melhor o conjunto.
 ```{r}
 summary(hr_lm)
 ```
@@ -73,18 +73,19 @@ p
 ```
 
 ###Regressao linear polinomial:
-Regressão quadrática
+Regressão quadrática (Vermelha)
 ```{r}
 k <- g + stat_smooth(method =lm,se = FALSE,formula=y~poly(x,2, raw = TRUE),colour="Red")
 k
 ```
 
-Regressão cúbica
+Regressão cúbica (Verde)
 ```{r}
-k + stat_smooth(method =lm,se = FALSE,formula=y~x+I(x^2)+I(x^3),colour="Green") 
+k <- k + stat_smooth(method =lm,se = FALSE,formula=y~x+I(x^2)+I(x^3),colour="Green") 
+k
 ```
 
-Regressão polinomial de ordem 17 (Overfitting)
+Regressão polinomial de ordem 17 (Overfitting - Azul)
 ```{r}
 j <- k + stat_smooth(method =lm,se = FALSE,formula=y~poly(x,17, raw = TRUE),colour="Blue") 
 j
@@ -110,7 +111,7 @@ mse3 <- mse(h3,pr)
 mse3
 ```
 
-As previsões feitas por h2 permitiram reduzir bem o valor do MSE da regressão, tornando-a mais eficiente que h1. Percebe-se também que a retirada da garagem, na estruturação da regressão 3 (h3), alterou pouco o MSE3, confirmando a análise da anova que ele mostrou sua baixa contribuição para a análise (os outros dois fatores são mais relevantes).
+As previsões feitas por h2 permitiram reduzir bem o valor do MSE da regressão, tornando-a mais eficiente que h1. Percebe-se também que a retirada da garagem, na estruturação da regressão 3 (h3), alterou pouco o MSE3, confirmando a análise da anova que mostrou sua baixa contribuição para a análise (os outros dois fatores são mais relevantes).
 
 ```{r}
 T2 <- hr
@@ -121,11 +122,12 @@ select(T2, preco, R2)
 
 ###Prevendo um valor com base em h2:
 ```{r}
+hr_lm2[1]
 a=1 #area*100
 g=0 #numero de garagens
 q=2 #numero de quartos
 
-y = 32.333993+(a*35.244193)+(g*3.701131)+(q*37.128)
+y = 32.333993+(a*35.244193)+(g*3.701131)+(q*37.127691)
 y
 ```
-Esse seria o valor de uma casa de 100m², nenhuma garagem e 2 quartos, segundo a previsão.
+Esse seria o valor de uma casa de 100m², nenhuma garagem e 2 quartos, segundo a previsão h2.
